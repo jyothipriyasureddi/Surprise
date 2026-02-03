@@ -295,11 +295,13 @@
     const GOALS = [10, 10, 10];
 
     // Slower pops
-    const POP_MIN = [900, 780, 680];
-    const POP_MAX = [1250, 1080, 960];
+   
+    const POP_MIN = [950, 820, 760];
+    const POP_MAX = [1250, 1050, 980];
+    
+    // Items stay up long enough to tap (still chill in Round 3)
+    const SHOW_MS  = [1150, 1050, 980];
 
-    // Items stay visible longer
-    const SHOW_MS  = [1100, 980, 900];
     // ----------------------------------------
 
     localStorage.removeItem("valentine_game_won");
@@ -453,10 +455,14 @@
         clearActive();
       }, SHOW_MS[round-1] ?? SHOW_MS[SHOW_MS.length-1]);
 
-      const min = POP_MIN[round-1] ?? POP_MIN[POP_MIN.length-1];
-      const max = POP_MAX[round-1] ?? POP_MAX[POP_MAX.length-1];
-      const delay = Math.floor(min + Math.random()*(max-min));
-      popTimer = setTimeout(nextPop, delay);
+      const show = SHOW_MS[round-1] ?? SHOW_MS[SHOW_MS.length-1];
+const min = POP_MIN[round-1] ?? POP_MIN[POP_MIN.length-1];
+const max = POP_MAX[round-1] ?? POP_MAX[POP_MAX.length-1];
+const delay = Math.floor(min + Math.random()*(max-min));
+
+// One-at-a-time pacing: next emoji appears after current one finishes showing
+popTimer = setTimeout(nextPop, show + delay);
+
     }
 
     function stopTimers(){
@@ -587,4 +593,5 @@
   </script>
 </body>
 </html>
+
 
