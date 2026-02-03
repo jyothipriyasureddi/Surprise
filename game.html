@@ -228,7 +228,7 @@
       <div class="header">
         <div>
           <div class="title">Whack-a-Snack 🍓</div>
-          <div class="subtitle">Tap desserts to score. Avoid dumbbells. Win <strong>2 out of 3</strong> rounds.</div>
+          <div class="subtitle">Tap desserts to score. Avoid gym stuff. Win <strong>2 out of 3</strong> rounds.</div>
         </div>
         <div class="metaRow">
           <div class="pill" id="timePill">Time: <strong>16.0</strong>s</div>
@@ -239,12 +239,15 @@
 
       <div class="barWrap"><div class="bar" id="timeBar"></div></div>
 
+      <!-- ✅ Updated legend -->
       <div class="legend">
         <span>🍩 +1</span>
         <span>🧁 +2</span>
         <span>🍓 +2</span>
         <span>🍰 +3</span>
         <span>🏋️ −3</span>
+        <span>🏃‍♂️ −2</span>
+        <span>🥦 −2</span>
         <span>No miss penalty 😌</span>
       </div>
 
@@ -275,7 +278,7 @@
   <div class="overlay" id="overlay">
     <div class="modal">
       <h2>Rules 😌</h2>
-      <p>Tap desserts to score. Avoid dumbbells. No penalties for missing. Need 2/3 rounds.</p>
+      <p>Tap desserts to score. Avoid gym stuff. No penalties for missing. Need 2/3 rounds.</p>
       <div class="row">
         <button class="ghost" id="ovClose">Not yet</button>
         <button class="primary" id="ovGo">Go 😌</button>
@@ -288,17 +291,14 @@
     const ROUNDS = 3;
     const NEED_WINS = 2;
 
-    // ✅ Longer time per round
     const ROUND_SECONDS = 16;
-
-    // ✅ Easier win goal
     const GOALS = [10, 10, 10];
 
-    // ✅ Slower pops (not too speedy)
+    // Slower pops
     const POP_MIN = [900, 780, 680];
     const POP_MAX = [1250, 1080, 960];
 
-    // ✅ Items stay visible longer
+    // Items stay visible longer
     const SHOW_MS  = [1100, 980, 900];
     // ----------------------------------------
 
@@ -355,7 +355,13 @@
       { e:"🍓", p: 2 },
       { e:"🍰", p: 3 },
     ];
-    const dumbbell = { e:"🏋️", p: -3 };
+
+    // ✅ Gym pool (added 🥦 + 🏃‍♂️)
+    const gymPool = [
+      { e:"🏋️", p: -3 },
+      { e:"🏃‍♂️", p: -2 },
+      { e:"🥦", p: -2 },
+    ];
 
     let running = false;
     let round = 1;
@@ -411,10 +417,16 @@
       setTimeout(()=> hole.classList.remove("showPop"), 240);
     }
 
+    // ✅ Balanced spawns: more gym items so it’s not too easy
     function pickItem(){
-      const dumbbellChance = round === 1 ? 0.22 : (round === 2 ? 0.28 : 0.33);
-      if(Math.random() < dumbbellChance) return dumbbell;
+      // round 1: 45% gym, round 2: 50% gym, round 3: 55% gym
+      const gymChance = round === 1 ? 0.45 : (round === 2 ? 0.50 : 0.55);
 
+      if (Math.random() < gymChance) {
+        return gymPool[Math.floor(Math.random() * gymPool.length)];
+      }
+
+      // desserts distribution
       const r = Math.random();
       if(r < 0.38) return dessertPool[0];
       if(r < 0.68) return dessertPool[1];
@@ -434,7 +446,6 @@
 
       hole.classList.add("active");
 
-      // hide after SHOW_MS (no penalties)
       setTimeout(() => {
         if(!running) return;
         if(activeIndex !== idx) return;
@@ -524,11 +535,10 @@
       clearActive();
       startBtn.disabled = false;
       startBtn.textContent = "Start";
-      toast.textContent = "Tap desserts to score. Avoid dumbbells. No penalties for missing 😌";
+      toast.textContent = "Tap desserts to score. Avoid gym stuff. No penalties for missing 😌";
       updateHUD();
     }
 
-    // Click behavior: only score when you tap the active tile
     holes.forEach(hole => {
       hole.addEventListener("click", () => {
         if(!running) return;
@@ -546,7 +556,6 @@
           clearActive();
           updateHUD();
         } else {
-          // wrong tile: no penalty
           showPopText(hole, "hehe");
         }
       }, { passive:true });
@@ -578,3 +587,4 @@
   </script>
 </body>
 </html>
+
