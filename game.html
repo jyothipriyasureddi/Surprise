@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Whack-a-Snack 🍰🏋️</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#ffe8f2; --bg2:#e9f7ff; --bg3:#fff6d6;
+      --ink:#3b2f3f; --muted:#6a5f70;
+      --card:#ffffffcc;
+      --shadow: 0 20px 60px rgba(60, 20, 60, .12);
+      --pink:#ff74b8; --lav:#b7a6ff; --mint:#7fe6d7; --sun:#ffd56a;
+      --btnText:#2f2032;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; padding:16px;
+      color:var(--ink);
+      font-family:"Quicksand", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 600px at 12% 8%, var(--bg1), transparent 55%),
+        radial-gradient(900px 650px at 92% 18%, var(--bg2), transparent 55%),
+        radial-gradient(900px 700px at 45% 115%, var(--bg3), transparent 60%),
+        linear-gradient(180deg, #ffffff, #fff7fb);
+      overflow-x:hidden;
+    }
+
+    .blob{
+      position:fixed; width:240px; height:240px;
+      border-radius:60% 40% 55% 45% / 55% 45% 60% 40%;
+      opacity:.55; z-index:0; pointer-events:none;
+      animation: floaty 7s ease-in-out infinite;
+    }
+    .b1{ left:-70px; top:-70px; background: radial-gradient(circle at 30% 30%, var(--pink), transparent 65%); }
+    .b2{ right:-80px; top:70px; background: radial-gradient(circle at 40% 40%, var(--lav), transparent 65%); animation-duration:8.2s;}
+    .b3{ left:40px; bottom:-100px; background: radial-gradient(circle at 40% 40%, var(--mint), transparent 65%); animation-duration:9s;}
+    @keyframes floaty{ 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(18px) rotate(6deg)} }
+
+    .wrap{ width:min(980px,100%); margin:0 auto; display:grid; gap:12px; position:relative; z-index:1; }
+    .card{
+      background:var(--card);
+      border:2px solid rgba(255,255,255,.9);
+      border-radius:26px;
+      box-shadow: var(--shadow);
+      padding:16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; }
+    .title{ margin:0; font-family:"Baloo 2", cursive; font-weight:800; font-size:26px; line-height:1.05; }
+    .subtitle{ margin:6px 0 0; color:var(--muted); font-weight:700; font-size:13px; }
+
+    .metaRow{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+    .pill{
+      background:#fff;
+      border:2px solid rgba(255,255,255,.9);
+      box-shadow: 0 10px 26px rgba(60, 20, 60, .08);
+      border-radius:999px;
+      padding:9px 12px;
+      font-weight:800;
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill strong{ color:var(--ink); }
+
+    .barWrap{
+      margin-top:12px;
+      background:#fff;
+      border:2px solid rgba(255,255,255,.9);
+      border-radius:999px;
+      padding:6px;
+      box-shadow: 0 10px 26px rgba(60, 20, 60, .06);
+    }
+    .bar{
+      height:14px; border-radius:999px; width:100%;
+      background: linear-gradient(90deg, var(--mint), var(--sun), var(--pink));
+      transform-origin:left center;
+      transform: scaleX(1);
+      transition: transform .1s linear;
+    }
+
+    .legend{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-weight:800; font-size:13px; }
+    .legend span{
+      padding:7px 10px; border-radius:999px;
+      background:#fff;
+      border:2px solid rgba(255,255,255,.85);
+      box-shadow: 0 10px 24px rgba(60, 20, 60, .06);
+    }
+
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px; }
+    button{
+      padding:12px 14px; border-radius:18px; border:0; cursor:pointer;
+      font-weight:900; user-select:none; font-family:"Baloo 2", cursive; letter-spacing:.2px;
+      transition: transform .08s ease;
+    }
+    button:active{ transform: translateY(3px) scale(.99); }
+    .primary{ background: linear-gradient(135deg, var(--sun), #fff1a8); color: var(--btnText); box-shadow: 0 12px 0 rgba(255, 213, 106, .35); }
+    .primary:active{ box-shadow: 0 8px 0 rgba(255, 213, 106, .35); }
+    .ghost{ background: linear-gradient(135deg, #ffd3ea, #ffeef7); color: var(--btnText); box-shadow: 0 12px 0 rgba(255, 116, 184, .18); }
+    .ghost:active{ box-shadow: 0 8px 0 rgba(255, 116, 184, .18); }
+
+    .toast{ margin-top:10px; min-height:22px; color:var(--muted); font-size:14px; font-weight:800; }
+
+    .boardCard{ padding:14px; }
+    .boardTop{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:10px; }
+
+    .roundDots{
+      display:flex; gap:6px; align-items:center;
+      padding:8px 10px; border-radius:999px; background:#fff;
+      border:2px solid rgba(255,255,255,.9);
+      box-shadow: 0 10px 26px rgba(60, 20, 60, .08);
+      font-weight:800; font-size:13px; color:var(--muted);
+    }
+    .dot{ width:10px; height:10px; border-radius:50%; background: rgba(59,47,63,.12); }
+    .dot.on{ background: var(--lav); }
+    .wins{ display:inline-flex; gap:4px; margin-left:6px; filter: drop-shadow(0 8px 8px rgba(0,0,0,.08)); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      width:100%;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .hole{
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,116,184,.18), transparent 55%),
+        radial-gradient(circle at 70% 20%, rgba(183,166,255,.18), transparent 55%),
+        radial-gradient(circle at 50% 90%, rgba(127,230,215,.18), transparent 55%),
+        #ffffff;
+      border:2px solid rgba(255,255,255,.9);
+      box-shadow: 0 14px 30px rgba(60, 20, 60, .08);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .thing{
+      font-size: 44px;
+      transform: translateY(6px) scale(.9);
+      opacity: 0;
+      transition: opacity .10s ease, transform .10s ease;
+      filter: drop-shadow(0 12px 12px rgba(0,0,0,.10));
+    }
+    .hole.active .thing{ opacity: 1; transform: translateY(0) scale(1); }
+
+    .pop{
+      position:absolute; bottom:10px;
+      font-weight:900; font-family:"Baloo 2", cursive;
+      padding:6px 10px; border-radius:999px;
+      background:#fff; border:2px solid rgba(255,255,255,.9);
+      box-shadow: 0 10px 20px rgba(60, 20, 60, .10);
+      opacity:0; transform: translateY(10px);
+      transition: opacity .12s ease, transform .12s ease;
+    }
+    .hole.showPop .pop{ opacity:1; transform: translateY(0); }
+
+    .overlay{
+      position:fixed; inset:0;
+      display:none; place-items:center;
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(6px);
+      z-index:5; padding:16px;
+    }
+    .overlay.show{ display:grid; }
+    .modal{
+      width:min(520px, 100%);
+      background: rgba(255,255,255,.92);
+      border:2px solid rgba(255,255,255,.95);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      text-align:center;
+    }
+    .modal h2{ margin:0 0 6px; font-family:"Baloo 2", cursive; font-size:26px; }
+    .modal p{ margin:8px 0; color:var(--muted); font-weight:700; }
+    .modal .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+
+    .confetti{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:6;
+      overflow:hidden;
+    }
+    .spark{
+      position:absolute; font-size:18px;
+      animation: pop 1.6s ease forwards;
+      opacity:0;
+      filter: drop-shadow(0 10px 8px rgba(0,0,0,.08));
+    }
+    @keyframes pop{
+      0%{ transform: translateY(0) scale(.7); opacity:0; }
+      10%{ opacity:1; }
+      100%{ transform: translateY(-140px) scale(1.25); opacity:0; }
+    }
+
+    @media (max-width: 520px){
+      .thing{ font-size: 40px; }
+      .grid{ gap:10px; }
+      .hole{ border-radius:20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div>
+          <div class="title">Whack-a-Snack 🍓</div>
+          <div class="subtitle">Tap desserts to score. Avoid dumbbells. Win <strong>2 out of 3</strong> rounds.</div>
+        </div>
+        <div class="metaRow">
+          <div class="pill" id="timePill">Time: <strong>16.0</strong>s</div>
+          <div class="pill" id="scorePill">Score: <strong>0</strong></div>
+          <div class="pill" id="goalPill">Goal: <strong>10</strong>+</div>
+        </div>
+      </div>
+
+      <div class="barWrap"><div class="bar" id="timeBar"></div></div>
+
+      <div class="legend">
+        <span>🍩 +1</span>
+        <span>🧁 +2</span>
+        <span>🍓 +2</span>
+        <span>🍰 +3</span>
+        <span>🏋️ −3</span>
+        <span>No miss penalty 😌</span>
+      </div>
+
+      <div class="controls">
+        <button class="ghost" id="restartBtn">Restart</button>
+        <button class="primary" id="startBtn">Start</button>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div class="card boardCard">
+      <div class="boardTop">
+        <div class="roundDots">
+          Rounds:
+          <span class="dot on" id="d1"></span>
+          <span class="dot" id="d2"></span>
+          <span class="dot" id="d3"></span>
+          <span class="wins" id="wins"></span>
+        </div>
+        <div class="pill" id="roundPill">Round: <strong>1</strong>/3</div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2>Rules 😌</h2>
+      <p>Tap desserts to score. Avoid dumbbells. No penalties for missing. Need 2/3 rounds.</p>
+      <div class="row">
+        <button class="ghost" id="ovClose">Not yet</button>
+        <button class="primary" id="ovGo">Go 😌</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------- Tuned settings (Option C) -------
+    const ROUNDS = 3;
+    const NEED_WINS = 2;
+
+    // ✅ Longer time per round
+    const ROUND_SECONDS = 16;
+
+    // ✅ Easier win goal
+    const GOALS = [10, 10, 10];
+
+    // ✅ Slower pops (not too speedy)
+    const POP_MIN = [900, 780, 680];
+    const POP_MAX = [1250, 1080, 960];
+
+    // ✅ Items stay visible longer
+    const SHOW_MS  = [1100, 980, 900];
+    // ----------------------------------------
+
+    localStorage.removeItem("valentine_game_won");
+
+    const confetti = document.getElementById("confetti");
+    const sparkles = ["✨","💖","💘","🌸","🍓","🧁","🍰"];
+    function popSparkles(n=16){
+      for(let i=0;i<n;i++){
+        const s = document.createElement("div");
+        s.className = "spark";
+        s.textContent = sparkles[Math.floor(Math.random()*sparkles.length)];
+        s.style.left = (Math.random()*100) + "vw";
+        s.style.top = (55 + Math.random()*30) + "vh";
+        s.style.animationDelay = (Math.random()*0.15) + "s";
+        confetti.appendChild(s);
+        setTimeout(()=>s.remove(), 1700);
+      }
+    }
+
+    const grid = document.getElementById("grid");
+    const timePill = document.getElementById("timePill");
+    const scorePill = document.getElementById("scorePill");
+    const goalPill = document.getElementById("goalPill");
+    const roundPill = document.getElementById("roundPill");
+    const timeBar = document.getElementById("timeBar");
+    const toast = document.getElementById("toast");
+
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const d1 = document.getElementById("d1");
+    const d2 = document.getElementById("d2");
+    const d3 = document.getElementById("d3");
+    const winsEl = document.getElementById("wins");
+
+    const overlay = document.getElementById("overlay");
+    const ovClose = document.getElementById("ovClose");
+    const ovGo = document.getElementById("ovGo");
+
+    const holes = [];
+    for(let i=0;i<9;i++){
+      const hole = document.createElement("div");
+      hole.className = "hole";
+      hole.dataset.index = String(i);
+      hole.innerHTML = `<div class="thing">✨</div><div class="pop">+0</div>`;
+      grid.appendChild(hole);
+      holes.push(hole);
+    }
+
+    const dessertPool = [
+      { e:"🍩", p: 1 },
+      { e:"🧁", p: 2 },
+      { e:"🍓", p: 2 },
+      { e:"🍰", p: 3 },
+    ];
+    const dumbbell = { e:"🏋️", p: -3 };
+
+    let running = false;
+    let round = 1;
+    let wins = 0;
+    let score = 0;
+    let timeLeft = ROUND_SECONDS;
+
+    let popTimer = null;
+    let countdownTimer = null;
+    let activeIndex = -1;
+    let activeItem = null;
+
+    function setDots(){
+      d1.classList.toggle("on", round === 1);
+      d2.classList.toggle("on", round === 2);
+      d3.classList.toggle("on", round === 3);
+    }
+    function setWins(){
+      winsEl.innerHTML = "";
+      for(let i=0;i<NEED_WINS;i++){
+        const s = document.createElement("span");
+        s.textContent = i < wins ? "💖" : "🤍";
+        winsEl.appendChild(s);
+      }
+    }
+
+    function updateHUD(){
+      roundPill.innerHTML = `Round: <strong>${round}</strong>/${ROUNDS}`;
+      timePill.innerHTML = `Time: <strong>${timeLeft.toFixed(1)}</strong>s`;
+      scorePill.innerHTML = `Score: <strong>${score}</strong>`;
+      const goal = GOALS[round-1] ?? GOALS[GOALS.length-1];
+      goalPill.innerHTML = `Goal: <strong>${goal}</strong>+`;
+
+      const pct = Math.max(0, Math.min(1, timeLeft / ROUND_SECONDS));
+      timeBar.style.transform = `scaleX(${pct})`;
+
+      setDots();
+      setWins();
+    }
+
+    function clearActive(){
+      if(activeIndex >= 0){
+        holes[activeIndex].classList.remove("active", "showPop");
+      }
+      activeIndex = -1;
+      activeItem = null;
+    }
+
+    function showPopText(hole, txt){
+      const pop = hole.querySelector(".pop");
+      pop.textContent = txt;
+      hole.classList.add("showPop");
+      setTimeout(()=> hole.classList.remove("showPop"), 240);
+    }
+
+    function pickItem(){
+      const dumbbellChance = round === 1 ? 0.22 : (round === 2 ? 0.28 : 0.33);
+      if(Math.random() < dumbbellChance) return dumbbell;
+
+      const r = Math.random();
+      if(r < 0.38) return dessertPool[0];
+      if(r < 0.68) return dessertPool[1];
+      if(r < 0.90) return dessertPool[2];
+      return dessertPool[3];
+    }
+
+    function nextPop(){
+      clearActive();
+
+      const idx = Math.floor(Math.random()*holes.length);
+      activeIndex = idx;
+
+      activeItem = pickItem();
+      const hole = holes[idx];
+      hole.querySelector(".thing").textContent = activeItem.e;
+
+      hole.classList.add("active");
+
+      // hide after SHOW_MS (no penalties)
+      setTimeout(() => {
+        if(!running) return;
+        if(activeIndex !== idx) return;
+        hole.classList.remove("active");
+        clearActive();
+      }, SHOW_MS[round-1] ?? SHOW_MS[SHOW_MS.length-1]);
+
+      const min = POP_MIN[round-1] ?? POP_MIN[POP_MIN.length-1];
+      const max = POP_MAX[round-1] ?? POP_MAX[POP_MAX.length-1];
+      const delay = Math.floor(min + Math.random()*(max-min));
+      popTimer = setTimeout(nextPop, delay);
+    }
+
+    function stopTimers(){
+      if(popTimer) clearTimeout(popTimer);
+      if(countdownTimer) clearInterval(countdownTimer);
+      popTimer = null;
+      countdownTimer = null;
+    }
+
+    function endRound(){
+      running = false;
+      stopTimers();
+      clearActive();
+
+      const goal = GOALS[round-1] ?? GOALS[GOALS.length-1];
+      const won = score >= goal;
+      if(won) wins++;
+
+      updateHUD();
+
+      if(won){
+        toast.textContent = `Round ${round} WIN ✅ (${score} pts)`;
+        popSparkles(22);
+      } else {
+        toast.textContent = `Round ${round} loss 😭 (${score} pts)`;
+        popSparkles(10);
+      }
+
+      if(round >= ROUNDS){
+        if(wins >= NEED_WINS){
+          toast.textContent = `You won ${wins}/${ROUNDS}. Unlocking next page… 💘`;
+          localStorage.setItem("valentine_game_won", "true");
+          popSparkles(34);
+          setTimeout(()=> window.location.href = "valentine.html", 900);
+        } else {
+          toast.textContent = `You won ${wins}/${ROUNDS}. Need ${NEED_WINS}. Hit Restart 😌`;
+          startBtn.textContent = "Start";
+        }
+        startBtn.disabled = false;
+        return;
+      }
+
+      round++;
+      startBtn.textContent = "Start next round";
+      startBtn.disabled = false;
+      updateHUD();
+    }
+
+    function startRound(){
+      score = 0;
+      timeLeft = ROUND_SECONDS;
+      running = true;
+      startBtn.disabled = true;
+
+      toast.textContent = `Round ${round}: easy vibes 😌`;
+      updateHUD();
+
+      let tick = 0;
+      countdownTimer = setInterval(() => {
+        tick++;
+        timeLeft = Math.max(0, ROUND_SECONDS - tick*0.1);
+        updateHUD();
+        if(timeLeft <= 0) endRound();
+      }, 100);
+
+      nextPop();
+    }
+
+    function resetAll(){
+      stopTimers();
+      running = false;
+      round = 1;
+      wins = 0;
+      score = 0;
+      timeLeft = ROUND_SECONDS;
+      clearActive();
+      startBtn.disabled = false;
+      startBtn.textContent = "Start";
+      toast.textContent = "Tap desserts to score. Avoid dumbbells. No penalties for missing 😌";
+      updateHUD();
+    }
+
+    // Click behavior: only score when you tap the active tile
+    holes.forEach(hole => {
+      hole.addEventListener("click", () => {
+        if(!running) return;
+
+        const idx = Number(hole.dataset.index);
+        if(idx === activeIndex && activeItem){
+          score += activeItem.p;
+
+          if(activeItem.p >= 0) showPopText(hole, `+${activeItem.p}`);
+          else showPopText(hole, `${activeItem.p}`);
+
+          if(activeItem.p > 0) popSparkles(3);
+
+          hole.classList.remove("active");
+          clearActive();
+          updateHUD();
+        } else {
+          // wrong tile: no penalty
+          showPopText(hole, "hehe");
+        }
+      }, { passive:true });
+    });
+
+    startBtn.addEventListener("click", () => {
+      if(running) return;
+      if(startBtn.textContent.toLowerCase().includes("start") && round === 1 && wins === 0){
+        overlay.classList.add("show");
+      } else {
+        startRound();
+      }
+    });
+
+    ovGo.addEventListener("click", () => {
+      overlay.classList.remove("show");
+      popSparkles(14);
+      setTimeout(startRound, 250);
+    });
+    ovClose.addEventListener("click", () => overlay.classList.remove("show"));
+
+    restartBtn.addEventListener("click", () => {
+      localStorage.removeItem("valentine_game_won");
+      popSparkles(12);
+      resetAll();
+    });
+
+    resetAll();
+  </script>
+</body>
+</html>
